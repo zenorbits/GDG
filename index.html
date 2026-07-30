@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GDG Navi Mumbai — Google Developer Groups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0a0d13;
+    --surface:#10141d;
+    --surface-2:#161c28;
+    --line: rgba(232,234,237,0.08);
+    --text:#e8eaed;
+    --muted:#8a93a6;
+    --blue:#4285f4;
+    --red:#ea4335;
+    --yellow:#fbbc05;
+    --green:#34a853;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--void);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  ::selection{background:var(--blue);color:#fff;}
+
+  a{color:inherit;text-decoration:none;}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  /* ---------- Nav ---------- */
+  nav{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:100;
+    padding:22px 0;
+    background:rgba(10,13,19,0);
+    transition:background .35s ease, border-color .35s ease, padding .35s ease;
+    border-bottom:1px solid transparent;
+  }
+  nav.scrolled{
+    background:rgba(10,13,19,0.85);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    padding:14px 0;
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;}
+  .nav-brand{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:17px;
+    letter-spacing:-0.01em;
+  }
+  .nav-brand .dot-g{
+    width:20px;height:20px;border-radius:50%;
+    background:conic-gradient(var(--blue) 0deg 90deg, var(--red) 90deg 180deg, var(--yellow) 180deg 270deg, var(--green) 270deg 360deg);
+  }
+  .nav-links{display:flex;gap:36px;font-size:14px;color:var(--muted);}
+  .nav-links a{transition:color .2s ease;}
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{
+    font-size:13px;
+    font-weight:600;
+    padding:9px 18px;
+    border-radius:100px;
+    background:var(--text);
+    color:var(--void);
+    transition:transform .2s ease, opacity .2s ease;
+  }
+  .nav-cta:hover{transform:translateY(-1px);opacity:0.9;}
+  .nav-toggle{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:120px 32px 80px;
+    overflow:hidden;
+  }
+
+  .hero-grid{
+    position:absolute;
+    inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    mask-image:radial-gradient(ellipse 60% 55% at 50% 40%, black 0%, transparent 75%);
+    opacity:0.7;
+  }
+
+  .eyebrow{
+    position:relative;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    letter-spacing:0.12em;
+    color:var(--muted);
+    text-transform:uppercase;
+    margin-bottom:36px;
+    padding:6px 14px;
+    border:1px solid var(--line);
+    border-radius:100px;
+  }
+
+  /* --- orbit logo, the signature element --- */
+  .orbit-stage{
+    position:relative;
+    width:260px;
+    height:260px;
+    margin-bottom:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .orbit-ring{
+    position:absolute;
+    border-radius:50%;
+    border:1px solid var(--line);
+  }
+  .ring-1{width:100%;height:100%;}
+  .ring-2{width:70%;height:70%;}
+
+  .orbit-core{
+    position:relative;
+    width:104px;
+    height:104px;
+    border-radius:50%;
+    background:var(--surface);
+    border:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:3;
+    box-shadow:0 0 60px rgba(66,133,244,0.15);
+  }
+  .orbit-core svg{width:52px;height:52px;}
+
+  .orbiter{
+    position:absolute;
+    inset:0;
+    animation:spin 24s linear infinite;
+  }
+  .orbiter.reverse{animation-direction:reverse;animation-duration:32s;}
+  .orbiter .node{
+    position:absolute;
+    width:16px;height:16px;
+    border-radius:50%;
+    top:50%;left:50%;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .o1 .node{background:var(--blue); transform:translate(-50%,-50%) translateY(-130px); box-shadow:0 0 18px rgba(66,133,244,0.6);}
+  .o2 .node{background:var(--red); transform:translate(-50%,-50%) translateY(130px); box-shadow:0 0 18px rgba(234,67,53,0.6);}
+  .o3 .node{background:var(--yellow); transform:translate(-50%,-50%) translateX(91px); box-shadow:0 0 18px rgba(251,188,5,0.6);}
+  .o4 .node{background:var(--green); transform:translate(-50%,-50%) translateX(-91px); box-shadow:0 0 18px rgba(52,168,83,0.6);}
+
+  h1.hero-title{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(38px, 6vw, 68px);
+    letter-spacing:-0.02em;
+    line-height:1.05;
+    max-width:820px;
+    margin-bottom:22px;
+  }
+  h1.hero-title .accent{
+    background:linear-gradient(90deg, var(--blue), var(--green));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .hero-sub{
+    font-size:17px;
+    color:var(--muted);
+    max-width:560px;
+    margin-bottom:40px;
+  }
+
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;}
+  .btn{
+    font-size:14px;
+    font-weight:600;
+    padding:13px 26px;
+    border-radius:100px;
+    transition:transform .2s ease, opacity .2s ease, border-color .2s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .btn-primary{background:var(--text); color:var(--void);}
+  .btn-primary:hover{transform:translateY(-2px); opacity:0.9;}
+  .btn-ghost{border:1px solid var(--line); color:var(--text);}
+  .btn-ghost:hover{border-color:rgba(232,234,237,0.3); transform:translateY(-2px);}
+
+  /* ---------- Sections shared ---------- */
+  section{padding:120px 0;}
+  .section-head{
+    max-width:640px;
+    margin-bottom:64px;
+  }
+  .kicker{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .kicker::before{
+    content:'';
+    width:26px; height:1px;
+    background:var(--blue);
+  }
+  .section-title{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(28px, 3.4vw, 40px);
+    letter-spacing:-0.01em;
+    margin-bottom:16px;
+  }
+  .section-desc{color:var(--muted); font-size:15.5px; max-width:520px;}
+
+  .reveal{
+    opacity:0;
+    transform:translateY(24px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .reveal.in-view{opacity:1; transform:translateY(0);}
+
+  /* ---------- About ---------- */
+  .about{background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .about-grid{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:60px;
+    align-items:start;
+  }
+  .about-copy p{color:var(--muted); font-size:15.5px; margin-bottom:18px; max-width:480px;}
+  .about-copy p strong{color:var(--text); font-weight:600;}
+
+  .stat-list{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:16px; overflow:hidden;}
+  .stat{background:var(--void); padding:28px 24px;}
+  .stat-num{
+    font-family:var(--font-display);
+    font-size:36px;
+    font-weight:600;
+    line-height:1;
+    margin-bottom:8px;
+  }
+  .stat:nth-child(1) .stat-num{color:var(--blue);}
+  .stat:nth-child(2) .stat-num{color:var(--red);}
+  .stat:nth-child(3) .stat-num{color:var(--yellow);}
+  .stat:nth-child(4) .stat-num{color:var(--green);}
+  .stat-label{font-size:13px; color:var(--muted);}
+
+  /* ---------- Tracks ---------- */
+  .track-grid{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .track-card{
+    background:var(--void);
+    padding:32px 26px;
+    transition:background .25s ease;
+    position:relative;
+  }
+  .track-card:hover{background:var(--surface-2);}
+  .track-bar{width:32px; height:4px; border-radius:4px; margin-bottom:24px;}
+  .track-card:nth-child(1) .track-bar{background:var(--blue);}
+  .track-card:nth-child(2) .track-bar{background:var(--red);}
+  .track-card:nth-child(3) .track-bar{background:var(--yellow);}
+  .track-card:nth-child(4) .track-bar{background:var(--green);}
+  .track-card h3{font-family:var(--font-display); font-size:19px; font-weight:600; margin-bottom:10px;}
+  .track-card p{font-size:14px; color:var(--muted);}
+
+  /* ---------- Timeline (events) ---------- */
+  .timeline{position:relative; padding-left:2px;}
+  .timeline::before{
+    content:'';
+    position:absolute;
+    left:19px; top:8px; bottom:8px;
+    width:1px;
+    background:var(--line);
+  }
+  .t-item{
+    position:relative;
+    display:grid;
+    grid-template-columns:40px 100px 1fr;
+    gap:24px;
+    align-items:start;
+    padding:26px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .t-item:last-child{border-bottom:none;}
+  .t-dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--blue);
+    margin-top:6px;
+    margin-left:15px;
+    z-index:2;
+    box-shadow:0 0 0 6px var(--void);
+  }
+  .t-item:nth-child(2) .t-dot{background:var(--red);}
+  .t-item:nth-child(3) .t-dot{background:var(--yellow);}
+  .t-item:nth-child(4) .t-dot{background:var(--green);}
+  .t-date{font-family:var(--font-mono); font-size:12.5px; color:var(--muted); padding-top:2px;}
+  .t-body h4{font-family:var(--font-display); font-size:17px; font-weight:600; margin-bottom:6px;}
+  .t-body p{font-size:14px; color:var(--muted); max-width:520px;}
+  .t-tag{
+    display:inline-block;
+    margin-top:12px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted);
+    border:1px solid var(--line);
+    padding:3px 10px;
+    border-radius:100px;
+  }
+
+  /* ---------- Speakers ---------- */
+  .speaker-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:20px;
+  }
+  .speaker-card{
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:28px;
+    background:var(--surface);
+    transition:transform .25s ease, border-color .25s ease;
+  }
+  .speaker-card:hover{transform:translateY(-4px); border-color:rgba(232,234,237,0.2);}
+  .avatar{
+    width:44px;height:44px;
+    border-radius:50%;
+    margin-bottom:18px;
+    background:conic-gradient(var(--blue), var(--red), var(--yellow), var(--green), var(--blue));
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display); font-weight:600; font-size:14px;
+  }
+  .avatar span{background:var(--surface); width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;}
+  .speaker-card h4{font-family:var(--font-display); font-size:16px; font-weight:600; margin-bottom:2px;}
+  .speaker-role{font-size:13px; color:var(--muted); margin-bottom:14px;}
+  .speaker-quote{font-size:14px; color:var(--muted); font-style:normal; line-height:1.6;}
+
+  /* ---------- Join / CTA ---------- */
+  .join{
+    background:var(--surface);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    text-align:center;
+  }
+  .join .section-head{margin:0 auto 40px; text-align:center;}
+  .join .kicker{justify-content:center;}
+  .join .kicker::before{display:none;}
+  .join-form{
+    display:flex;
+    gap:10px;
+    max-width:440px;
+    margin:0 auto;
+  }
+  .join-form input{
+    flex:1;
+    background:var(--void);
+    border:1px solid var(--line);
+    border-radius:100px;
+    padding:13px 20px;
+    color:var(--text);
+    font-family:var(--font-body);
+    font-size:14px;
+  }
+  .join-form input:focus{outline:none; border-color:var(--blue);}
+  .join-note{margin-top:16px; font-size:12.5px; color:var(--muted); font-family:var(--font-mono);}
+  .join-success{margin-top:16px; font-size:13.5px; color:var(--green); font-family:var(--font-mono); display:none;}
+
+  /* ---------- Footer ---------- */
+  footer{padding:60px 0 40px;}
+  .footer-grid{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:24px;
+    padding-bottom:32px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:24px;
+  }
+  .footer-brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:600;}
+  .footer-links{display:flex; gap:28px; font-size:13.5px; color:var(--muted);}
+  .footer-links a:hover{color:var(--text);}
+  .footer-bottom{display:flex; justify-content:space-between; color:var(--muted); font-size:12.5px; flex-wrap:wrap; gap:10px;}
+
+  /* ---------- Scroll to top ---------- */
+  .to-top{
+    position:fixed;
+    bottom:28px; right:28px;
+    width:44px; height:44px;
+    border-radius:50%;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease, transform .2s ease;
+    z-index:90;
+  }
+  .to-top.visible{opacity:1; pointer-events:auto;}
+  .to-top:hover{transform:translateY(-2px);}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:860px){
+    .nav-links{display:none;}
+    .nav-toggle{display:block;}
+    .about-grid{grid-template-columns:1fr;}
+    .track-grid{grid-template-columns:1fr 1fr;}
+    .speaker-grid{grid-template-columns:1fr;}
+    .t-item{grid-template-columns:24px 1fr; }
+    .t-date{grid-column:2; margin-bottom:-6px;}
+    .t-body{grid-column:2;}
+    .t-dot{margin-left:8px;}
+  }
+  @media (max-width:520px){
+    .track-grid{grid-template-columns:1fr;}
+    .join-form{flex-direction:column;}
+    .stat-list{grid-template-columns:1fr;}
+    .orbit-stage{width:200px;height:200px;}
+    .o1 .node{transform:translate(-50%,-50%) translateY(-98px);}
+    .o2 .node{transform:translate(-50%,-50%) translateY(98px);}
+    .o3 .node{transform:translate(-50%,-50%) translateX(70px);}
+    .o4 .node{transform:translate(-50%,-50%) translateX(-70px);}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    .orbiter{animation:none;}
+    .reveal{transition:none; opacity:1; transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<nav id="nav">
+  <div class="wrap">
+    <div class="nav-brand"><span class="dot-g"></span> GDG Navi Mumbai</div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#tracks">Tracks</a>
+      <a href="#events">Events</a>
+      <a href="#speakers">Speakers</a>
+    </div>
+    <a href="#join" class="nav-cta">Join chapter</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-grid"></div>
+
+  <div class="eyebrow">Google Developer Groups · Navi Mumbai Chapter</div>
+
+  <div class="orbit-stage">
+    <div class="orbit-ring ring-1"></div>
+    <div class="orbit-ring ring-2"></div>
+    <div class="orbiter o1"><div class="node"></div></div>
+    <div class="orbiter o2 reverse"><div class="node"></div></div>
+    <div class="orbiter o3"><div class="node"></div></div>
+    <div class="orbiter o4 reverse"><div class="node"></div></div>
+    <div class="orbit-core">
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+        <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+        <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"/>
+        <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+      </svg>
+    </div>
+  </div>
+
+  <h1 class="hero-title">Where developers in Navi Mumbai <span class="accent">build, ship, and learn together.</span></h1>
+  <p class="hero-sub">A community-run chapter under Google Developer Groups — monthly meetups, hands-on workshops, and a network of engineers building with Android, Web, Cloud, and AI.</p>
+
+  <div class="hero-actions">
+    <a href="#join" class="btn btn-primary">Join the chapter</a>
+    <a href="#events" class="btn btn-ghost">See upcoming events</a>
+  </div>
+</header>
+
+<section class="about" id="about">
+  <div class="wrap about-grid">
+    <div class="about-copy reveal">
+      <div class="kicker">About the chapter</div>
+      <h2 class="section-title">Built by developers, for developers.</h2>
+      <p><strong>GDG Navi Mumbai</strong> is a volunteer-led community under Google Developer Groups. We run free monthly sessions where engineers, students, and founders across Panvel, Vashi, and Thane get together to learn and build.</p>
+      <p>No talk is a product pitch. Every session ships something — a working demo, an open-source repo, or a deployed project you can point to on your resume by the time you leave.</p>
+      <p>Whether you're writing your first Android app or scaling a production API, there's a room here for you.</p>
+    </div>
+    <div class="stat-list reveal">
+      <div class="stat"><div class="stat-num" data-count="1400">0</div><div class="stat-label">Community members</div></div>
+      <div class="stat"><div class="stat-num" data-count="38">0</div><div class="stat-label">Events hosted</div></div>
+      <div class="stat"><div class="stat-num" data-count="52">0</div><div class="stat-label">Speakers featured</div></div>
+      <div class="stat"><div class="stat-num" data-count="6">0</div><div class="stat-label">Cities reached</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="tracks">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">What we cover</div>
+      <h2 class="section-title">Four tracks, one community.</h2>
+      <p class="section-desc">Sessions rotate across Google's core developer surfaces — pick the track that matches what you're building.</p>
+    </div>
+    <div class="track-grid reveal">
+      <div class="track-card">
+        <div class="track-bar"></div>
+        <h3>Android</h3>
+        <p>Kotlin, Jetpack Compose, and shipping to the Play Store — from your first layout to production releases.</p>
+      </div>
+      <div class="track-card">
+        <div class="track-bar"></div>
+        <h3>Web</h3>
+        <p>Modern frontend tooling, performance, and the platform APIs that ship in Chrome first.</p>
+      </div>
+      <div class="track-card">
+        <div class="track-bar"></div>
+        <h3>Cloud</h3>
+        <p>Google Cloud fundamentals, Firebase, and deploying real backends without the guesswork.</p>
+      </div>
+      <div class="track-card">
+        <div class="track-bar"></div>
+        <h3>AI &amp; ML</h3>
+        <p>Gemini API, on-device ML, and practical model integration for apps people actually use.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="events">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">Upcoming events</div>
+      <h2 class="section-title">Next few sessions.</h2>
+      <p class="section-desc">Free to attend, open to all skill levels. Reserve a seat — most sessions fill up within a week.</p>
+    </div>
+    <div class="timeline reveal">
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-date">AUG 09</div>
+        <div class="t-body">
+          <h4>Build with Gemini API — a hands-on workshop</h4>
+          <p>Ship a working AI feature end-to-end: prompting, function calling, and wiring it into a real app.</p>
+          <span class="t-tag">AI &amp; ML · Workshop</span>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-date">AUG 23</div>
+        <div class="t-body">
+          <h4>Jetpack Compose: from layout to launch</h4>
+          <p>A guided build session — walk out with an Android app running on your own device.</p>
+          <span class="t-tag">Android · Build session</span>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-date">SEP 06</div>
+        <div class="t-body">
+          <h4>Deploying on Cloud Run without the guesswork</h4>
+          <p>Containers, cold starts, and cost — a practical walkthrough of shipping a backend that scales to zero.</p>
+          <span class="t-tag">Cloud · Talk</span>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-dot"></div>
+        <div class="t-date">SEP 20</div>
+        <div class="t-body">
+          <h4>DevFest Navi Mumbai — call for speakers open</h4>
+          <p>Our biggest event of the year. A full day of talks, lightning demos, and a community showcase.</p>
+          <span class="t-tag">Community · Flagship</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="speakers">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">From the community</div>
+      <h2 class="section-title">People who've spoken at GDG Navi Mumbai.</h2>
+      <p class="section-desc">Our speaker roster is mostly local — engineers sharing what they actually shipped, not slides recycled from a conference circuit.</p>
+    </div>
+    <div class="speaker-grid reveal">
+      <div class="speaker-card">
+        <div class="avatar"><span>AR</span></div>
+        <h4>Aditi Rao</h4>
+        <div class="speaker-role">Android Engineer</div>
+        <p class="speaker-quote">"Spoke about Compose animations to a room that asked better questions than most conferences I've been to."</p>
+      </div>
+      <div class="speaker-card">
+        <div class="avatar"><span>KM</span></div>
+        <h4>Karan Mehta</h4>
+        <div class="speaker-role">Backend &amp; Cloud</div>
+        <p class="speaker-quote">"This chapter's audience actually deploys what they learn. That feedback loop is rare."</p>
+      </div>
+      <div class="speaker-card">
+        <div class="avatar"><span>SP</span></div>
+        <h4>Sneha Patil</h4>
+        <div class="speaker-role">ML Engineer</div>
+        <p class="speaker-quote">"Ran a Gemini API workshop here — half the room shipped a working demo before the session ended."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="join" id="join">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">Join the chapter</div>
+      <h2 class="section-title">Get the next event in your inbox.</h2>
+      <p class="section-desc" style="margin:0 auto;">One email before each session. No spam, no recruiter forwarding it to you later.</p>
+    </div>
+    <form class="join-form reveal" id="joinForm">
+      <input type="email" placeholder="you@example.com" required id="joinEmail">
+      <button type="submit" class="btn btn-primary">Notify me</button>
+    </form>
+    <div class="join-note reveal">gdg.community.dev/gdg-navi-mumbai</div>
+    <div class="join-success" id="joinSuccess">You're on the list — see you at the next session.</div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand"><span class="dot-g"></span> GDG Navi Mumbai</div>
+      <div class="footer-links">
+        <a href="#about">About</a>
+        <a href="#tracks">Tracks</a>
+        <a href="#events">Events</a>
+        <a href="#speakers">Speakers</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 GDG Navi Mumbai. Independently organized community event.</span>
+      <span>Not officially endorsed by Google.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="to-top" id="toTop" aria-label="Back to top">↑</div>
+
+<script>
+  // Nav background on scroll
+  const nav = document.getElementById('nav');
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    nav.classList.toggle('scrolled', y > 40);
+    toTop.classList.toggle('visible', y > 600);
+  });
+
+  toTop.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+
+  // Mobile nav toggle -> reuse links in a simple inline dropdown
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.querySelector('.nav-links');
+  navToggle.addEventListener('click', () => {
+    const isOpen = navLinks.style.display === 'flex';
+    navLinks.style.display = isOpen ? 'none' : 'flex';
+    navLinks.style.position = 'absolute';
+    navLinks.style.top = '100%';
+    navLinks.style.left = '0';
+    navLinks.style.right = '0';
+    navLinks.style.flexDirection = 'column';
+    navLinks.style.background = 'rgba(10,13,19,0.97)';
+    navLinks.style.padding = '20px 32px';
+    navLinks.style.gap = '18px';
+    navLinks.style.borderBottom = '1px solid var(--line)';
+  });
+
+  // Scroll reveal
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+
+  // Animated counters
+  const counters = document.querySelectorAll('.stat-num');
+  const counterIO = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.getAttribute('data-count'), 10);
+        const duration = 1400;
+        const start = performance.now();
+        function tick(now){
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          el.textContent = Math.round(eased * target).toLocaleString();
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+        counterIO.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(el => counterIO.observe(el));
+
+  // Join form
+  const joinForm = document.getElementById('joinForm');
+  const joinSuccess = document.getElementById('joinSuccess');
+  joinForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    joinForm.style.opacity = '0.5';
+    joinForm.style.pointerEvents = 'none';
+    joinSuccess.style.display = 'block';
+  });
+</script>
+
+</body>
+</html>
